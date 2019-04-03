@@ -2299,6 +2299,32 @@ const devices = [
         },
     },
     {
+        zigbeeModel: ['multi'],
+        model: 'IM6001-MPP01',
+        vendor: 'SmartThings',
+        description: 'Multi Sensor (2018 model)',
+        supports: 'contact and temperature',
+        fromZigbee: [
+            fz.generic_temperature, fz.smartsense_multi,
+            fz.ignore_iaszone_change, fz.ignore_temperature_change
+        ],
+        toZigbee: [],
+        configure: (ieeeAddr, shepherd, coordinator, callback) => {
+            const device = shepherd.find(ieeeAddr, 1);
+            const actions = [
+                (cb) => device.bind('msTemperatureMeasurement', coordinator, cb),
+                (cb) => device.report('msTemperatureMeasurement', 'measuredValue', 300, 600, 1, cb),
+                (cb) => device.write('ssIasZone', 'iasCieAddr', coordinator.device.getIeeeAddr(), cb),
+                (cb) => device.report('ssIasZone', 'zoneStatus', 0, 1000, null, cb),
+                (cb) => device.functional('ssIasZone', 'enrollRsp', {
+                    enrollrspcode: 1,
+                    zoneid: 23,
+                }, cb),
+            ];
+            execute(device, actions, callback);
+        },
+    },
+    {
         zigbeeModel: ['outlet'],
         model: 'IM6001-OTP05',
         vendor: 'SmartThings',
