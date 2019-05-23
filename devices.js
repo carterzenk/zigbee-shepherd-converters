@@ -2305,8 +2305,9 @@ const devices = [
         description: 'Multi Sensor (2018 model)',
         supports: 'contact and temperature',
         fromZigbee: [
-            fz.generic_temperature, fz.smartsense_multi,
-            fz.ignore_iaszone_change, fz.ignore_temperature_change
+            fz.generic_temperature, fz.generic_batteryvoltage_3000_2500,
+            fz.smartsense_multi, fz.ignore_iaszone_change,
+            fz.ignore_temperature_change
         ],
         toZigbee: [],
         configure: (ieeeAddr, shepherd, coordinator, callback) => {
@@ -2314,6 +2315,8 @@ const devices = [
             const actions = [
                 (cb) => device.bind('msTemperatureMeasurement', coordinator, cb),
                 (cb) => device.report('msTemperatureMeasurement', 'measuredValue', 300, 600, 1, cb),
+                (cb) => device.bind('genPowerCfg', coordinator, cb),
+                (cb) => device.report('genPowerCfg', 'batteryVoltage', 0, 1000, 0, cb),
                 (cb) => device.write('ssIasZone', 'iasCieAddr', coordinator.device.getIeeeAddr(), cb),
                 (cb) => device.report('ssIasZone', 'zoneStatus', 0, 1000, null, cb),
                 (cb) => device.functional('ssIasZone', 'enrollRsp', {
